@@ -152,7 +152,9 @@ public class TCPClient implements Runnable{
 		WriteToLog(str, 'S') ;
                 theString = ReplaceDLEwithDLEDLEandWrap(theString) ;
 		try{
-			out.writeBytes(theString) ;
+            byte[] barray = theString.getBytes() ;
+            out.write(barray) ;
+//			out.writeBytes(theString) ;
 		}catch(IOException e){
 			clientlog.warn(this.getClass().getName() + " -> " + "WARN IOE tcpclient.Send - " + e.toString() ) ;
 		}catch(NullPointerException e2){
