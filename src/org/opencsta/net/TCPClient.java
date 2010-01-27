@@ -41,6 +41,7 @@ public class TCPClient implements Runnable{
 	int PORT  ;
 	String SERVER_ADDRESS ;
     private boolean REPLACEDLEWITHDLEDLE ;
+    private boolean REPLACEDLEDLEWITHDLE;
 	private DataOutputStream out ;
 	private DataInputStream in ;
 	private Socket socket ;
@@ -49,6 +50,7 @@ public class TCPClient implements Runnable{
 	private boolean runFlag = false ;
 	private int line ;
 	private StringBuffer chris ;
+
 
 //        public static void main(String[] args){
 //            TCPClient tcp = new TCPClient("tcpclient") ;
@@ -64,9 +66,10 @@ public class TCPClient implements Runnable{
 	public TCPClient(TCPClientOwnerInterface parent, String _appname,Properties _theProps){
 		APPNAME = _appname.toUpperCase() ;
         theProps = _theProps ;
+        CSTAClientCommunications = false ;
 		this.parent = parent ;
         socket = null ;
-		Init() ;
+        Init() ;
 	}
 
 	public void Init(){
@@ -79,8 +82,11 @@ public class TCPClient implements Runnable{
 			PORT = Integer.parseInt( theProps.getProperty(APPNAME + "_SERVER_PORT") ) ;
             clientlog.info(this.getClass().getName() + " -> " + "Setting SERVER_ADDRESS -> Getting property: " + APPNAME + "_SERVER_ADDRESS") ;
 			SERVER_ADDRESS = theProps.getProperty(APPNAME + "_SERVER_ADDRESS") ;
-            REPLACEDLEWITHDLEDLE = Boolean.parseBoolean( theProps.getProperty(APPNAME + "_REPLACEDLEWITHDLEDLE" ) ) ;
+            setREPLACEDLEWITHDLEDLE(Boolean.parseBoolean( theProps.getProperty(APPNAME + "_REPLACEDLEWITHDLEDLE" ) )) ;
+            setREPLACEDLEDLEWITHDLE(Boolean.parseBoolean(theProps.getProperty(APPNAME + "_REPLACEDLEDLEWITHDLE"))) ;
             clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEWITHDLEDLE is set to " + REPLACEDLEWITHDLEDLE ) ;
+            clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEDLEWITHDLE is set to " + REPLACEDLEDLEWITHDLE ) ;
+            clientlog.info(this.getClass().getName() + " -> " + "CSTAClientCommunications is set to " + isCSTAClientCommunications() ) ;
             String logstr = "CSTAServer address: " + SERVER_ADDRESS ;
 			setSocket(new Socket(SERVER_ADDRESS, PORT)) ;
 			logstr += "|||Socket connected to: " + getSocket() ;
@@ -120,17 +126,19 @@ public class TCPClient implements Runnable{
 	}
 
 	public void run(){
-        if( isCSTAClientCommunications() == true ){
+        setCSTAClientCommunications(false);
+        if( isCSTAClientCommunications() ){
             internalComms() ;
         }
         else{
             this.setRunFlag(true) ;
             while(runFlag){
+                System.out.println("CHRIS") ;
                 try{
                     buf = new byte[1024] ;
                     line = in.read(buf);
                     clientlog.info(this.getClass().getName() + " -> " + line + " bytes received") ;
-                    buf2SBChris(line) ;
+                    buf2SBChris_NC(line) ;
                 } catch (IOException e) {
                     clientlog.warn(this.getClass().getName() + " -> " + "Read failed");
                     //System.exit(-1);
@@ -188,9 +196,69 @@ public class TCPClient implements Runnable{
 		}
 		checkBuffer() ;
 	}
-	
+
+
+	private void buf2SBChris_NC(int length){
+		for( int i = 0 ; i < length ; i++){
+
+            if( (short)buf[i] < 0 ){
+                append2chris( (int)buf[i] + 256 ) ;
+            }
+
+            else{
+                Byte b = new Byte(buf[i]) ;
+                append2chris( (int) b.intValue() ) ;
+            }
+		}
+		checkBuffer_NC() ;
+	}
+
+	private void checkBuffer_NC(){
+        TestChris(chris) ;
+		if( chris.length() > 1 ){
+			if( isBufferResetableAndEven_NC(chris) ){
+				clientlog.info(this.getClass().getName() + " -> " + "Incoming Buffer is even and being reset");
+				parent.addWorkIN(new StringBuffer(chris)) ;
+				chris = new StringBuffer() ;
+			}
+			else if( isBufferStillReading_NC(chris) ){
+                clientlog.info(this.getClass().getName() + " -> " + "Buffer is still reading") ;
+//				System.out.println("Incoming Buffer is still reading");
+//				System.out.println("The length of chris at the moment is: " + Integer.toString(chris.length() ) );
+//				System.out.println("The length of chris full message should be (hex): " + Integer.toHexString( (int)chris.charAt(2)) ) ;
+//				System.out.println("The length of chris full message should be (dec): " + Integer.toString( chris.charAt(2)) ) ;
+			}
+			else if( isBufferHoldingMoreThanOneMessage_NC(chris) ){
+                clientlog.info(this.getClass().getName() + " -> " + "Buffer is holding more than one message");
+//				System.out.println("Incoming Buffer has over read more than one message") ;
+//				System.out.println("The length of chris at the moment is: " + Integer.toString(chris.length() ) );
+//				System.out.println("The length of chris full message should be (hex): " + Integer.toHexString( (int)chris.charAt(2)) ) ;
+//				System.out.println("The length of chris full message should be (dec): " + Integer.toString( chris.charAt(2)) ) ;
+				StringBuffer tmp = new StringBuffer(chris.substring(0, (((int)chris.charAt(1)) + 2 ))) ;
+//				System.out.println("Test this tmp string") ;
+//				TestChris(tmp) ;
+//				System.out.println("Test this tmp string") ;
+//				TestChris(tmp) ;
+//				System.out.println("Test this tmp string") ;
+//				TestChris(tmp) ;
+//				System.out.println("Test this tmp string") ;
+//				TestChris(tmp) ;
+				parent.addWorkIN(new StringBuffer( chris.substring(0, (((int)chris.charAt(1)) + 2)) )) ;
+				chris = new StringBuffer(chris.substring( ((int)chris.charAt(1) + 2)))  ;
+//				System.out.println("The new active buffered message is") ;
+//				TestChris(chris) ;
+//				System.out.println("The new active buffered message is") ;
+//				TestChris(chris) ;
+//				System.out.println("The new active buffered message is") ;
+//				TestChris(chris) ;
+				checkBuffer_NC() ;
+			}
+		}
+	}
+
+
 	private void checkBuffer(){
-		if( chris.length() > 5 ){
+		if( chris.length() > 1 ){
 			TestChris(chris) ;
 			if( isBufferResetableAndEven(chris) ){
 				clientlog.info(this.getClass().getName() + " -> " + "Incoming Buffer is even and being reset");
@@ -258,16 +326,49 @@ public class TCPClient implements Runnable{
         curOutStr2 = curOutStr2.append(DLEETX) ;
         return curOutStr2.toString() ;
     }
-	
+
 	private boolean isBufferResetableAndEven(StringBuffer sb){
 		if( chris.length() == ((int)chris.charAt(2) + 3) ){
 			return true ;
 		}
 		return false ;
 	}
-	
+
 	private boolean isBufferHoldingMoreThanOneMessage(StringBuffer sb){
 		if( chris.length() > ((int)chris.charAt(2) + 3) ){
+			return true ;
+		}
+		return false ;
+	}
+
+	private boolean isBufferStillReading_NC(StringBuffer sb){
+		String bufLength = Integer.toString(chris.length() ) ;
+        if( sb.length() > 1 ){
+            String intendedLength = Integer.toHexString((int)chris.charAt(1)) ;
+            clientlog.info(this.getClass().getName() + " -> " + "Buffer status -> Intended Length: " + intendedLength + " | Current Length: " + bufLength ) ;
+            if( chris.length() < ((int)chris.charAt(1)) ){
+                clientlog.info(this.getClass().getName() + " -> " + "Buffer is still reading") ;
+                return true ;
+            }
+            clientlog.info(this.getClass().getName() + " -> " + "Buffer is complete, now ready for clearing") ;
+        }
+        else{
+            return false ;
+        }
+        return false ;
+	}
+
+
+
+	private boolean isBufferResetableAndEven_NC(StringBuffer sb){
+		if( chris.length() == (int)chris.charAt(1) ){
+			return true ;
+		}
+		return false ;
+	}
+	
+	private boolean isBufferHoldingMoreThanOneMessage_NC(StringBuffer sb){
+		if( chris.length() > (int)chris.charAt(1) ){
 			return true ;
 		}
 		return false ;
@@ -300,9 +401,8 @@ public class TCPClient implements Runnable{
         private void internalComms(){
             try{
                 while(true){
-                    clientlog.info("####### 1") ;
                     int bytes = in.read(CCCbuffer) ;
-                    clientlog.info("####### 2") ;
+                    clientlog.info("####### 1 - read bytes in") ;
                     if( bytes > 0 ){
                         for( int i = 0 ; i < bytes ; i++ ){
                             if( (short)CCCbuffer[i] < 0 ){
@@ -311,10 +411,12 @@ public class TCPClient implements Runnable{
                                 CCCAddToBuffer( (int)CCCbuffer[i] ) ;
                             }
                         }
-                        clientlog.info("####### 3") ;
+                        clientlog.info("####### 2 - bytes read") ;
                         if(CCCcomplete == true){
                             clientlog.info("####### 4") ;
-                            CCCrxstr = ReplaceDLEDLEwithDLEandStrip(CCCrxstr) ;
+                            if( isREPLACEDLEDLEWITHDLE() ){
+                                CCCrxstr = ReplaceDLEDLEwithDLEandStrip(CCCrxstr) ;
+                            }
                             String logStr = "" ;
                             for(int i = 0 ; i < CCCrxstr.length() ; i++ ){
                                 logStr += Integer.toHexString(CCCrxstr.charAt(i)) + " "  ;
@@ -463,5 +565,19 @@ public class TCPClient implements Runnable{
      */
     public void setREPLACEDLEWITHDLEDLE(boolean REPLACEDLEWITHDLEDLE) {
         this.REPLACEDLEWITHDLEDLE = REPLACEDLEWITHDLEDLE;
+    }
+
+    /**
+     * @return the REPLACEDLEDLEWITHDLE
+     */
+    public boolean isREPLACEDLEDLEWITHDLE() {
+        return REPLACEDLEDLEWITHDLE;
+    }
+
+    /**
+     * @param REPLACEDLEDLEWITHDLE the REPLACEDLEDLEWITHDLE to set
+     */
+    public void setREPLACEDLEDLEWITHDLE(boolean REPLACEDLEDLEWITHDLE) {
+        this.REPLACEDLEDLEWITHDLE = REPLACEDLEDLEWITHDLE;
     }
 }
