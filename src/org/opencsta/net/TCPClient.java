@@ -40,6 +40,7 @@ public class TCPClient implements Runnable{
 	String APPNAME ;
 	int PORT  ;
 	String SERVER_ADDRESS ;
+    private boolean REPLACEDLEWITHDLEDLE ;
 	private DataOutputStream out ;
 	private DataInputStream in ;
 	private Socket socket ;
@@ -78,7 +79,9 @@ public class TCPClient implements Runnable{
 			PORT = Integer.parseInt( theProps.getProperty(APPNAME + "_SERVER_PORT") ) ;
             clientlog.info(this.getClass().getName() + " -> " + "Setting SERVER_ADDRESS -> Getting property: " + APPNAME + "_SERVER_ADDRESS") ;
 			SERVER_ADDRESS = theProps.getProperty(APPNAME + "_SERVER_ADDRESS") ;
-			String logstr = "CSTAServer address: " + SERVER_ADDRESS ;
+            REPLACEDLEWITHDLEDLE = Boolean.parseBoolean( theProps.getProperty(APPNAME + "_REPLACEDLEWITHDLEDLE" ) ) ;
+            clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEWITHDLEDLE is set to " + REPLACEDLEWITHDLEDLE ) ;
+            String logstr = "CSTAServer address: " + SERVER_ADDRESS ;
 			setSocket(new Socket(SERVER_ADDRESS, PORT)) ;
 			logstr += "|||Socket connected to: " + getSocket() ;
 			clientlog.info(this.getClass().getName() + " -> connection details: " + logstr) ;
@@ -150,7 +153,9 @@ public class TCPClient implements Runnable{
 	public void Send(StringBuffer str){
 		String theString = str.toString() ;
 		WriteToLog(str, 'S') ;
-                theString = ReplaceDLEwithDLEDLEandWrap(theString) ;
+        if( isREPLACEDLEWITHDLEDLE() ){
+            theString = ReplaceDLEwithDLEDLEandWrap(theString) ;
+        }
 		try{
             byte[] barray = theString.getBytes() ;
             out.write(barray) ;
@@ -444,5 +449,19 @@ public class TCPClient implements Runnable{
      */
     public void setSocket(Socket socket) {
         this.socket = socket;
+    }
+
+    /**
+     * @return the REPLACEDLEWITHDLEDLE
+     */
+    public boolean isREPLACEDLEWITHDLEDLE() {
+        return REPLACEDLEWITHDLEDLE;
+    }
+
+    /**
+     * @param REPLACEDLEWITHDLEDLE the REPLACEDLEWITHDLEDLE to set
+     */
+    public void setREPLACEDLEWITHDLEDLE(boolean REPLACEDLEWITHDLEDLE) {
+        this.REPLACEDLEWITHDLEDLE = REPLACEDLEWITHDLEDLE;
     }
 }
