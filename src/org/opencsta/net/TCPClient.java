@@ -40,8 +40,8 @@ public class TCPClient implements Runnable{
 	String APPNAME ;
 	int PORT  ;
 	String SERVER_ADDRESS ;
-    private boolean REPLACEDLEWITHDLEDLE ;
-    private boolean REPLACEDLEDLEWITHDLE;
+    private boolean REPLACEDLEWITHDLEDLE = false;
+    private boolean REPLACEDLEDLEWITHDLE = false;
 	private DataOutputStream out ;
 	private DataInputStream in ;
 	private Socket socket ;
@@ -67,6 +67,8 @@ public class TCPClient implements Runnable{
 		APPNAME = _appname.toUpperCase() ;
         theProps = _theProps ;
         CSTAClientCommunications = false ;
+        REPLACEDLEWITHDLEDLE = false;
+        REPLACEDLEDLEWITHDLE = false;
 		this.parent = parent ;
         socket = null ;
         Init() ;
@@ -82,9 +84,6 @@ public class TCPClient implements Runnable{
 			PORT = Integer.parseInt( theProps.getProperty(APPNAME + "_SERVER_PORT") ) ;
             clientlog.info(this.getClass().getName() + " -> " + "Setting SERVER_ADDRESS -> Getting property: " + APPNAME + "_SERVER_ADDRESS") ;
 			SERVER_ADDRESS = theProps.getProperty(APPNAME + "_SERVER_ADDRESS") ;
-            clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEWITHDLEDLE is set to " + REPLACEDLEWITHDLEDLE ) ;
-            clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEDLEWITHDLE is set to " + REPLACEDLEDLEWITHDLE ) ;
-            clientlog.info(this.getClass().getName() + " -> " + "CSTAClientCommunications is set to " + isCSTAClientCommunications() ) ;
             String logstr = "CSTAServer address: " + SERVER_ADDRESS ;
 			setSocket(new Socket(SERVER_ADDRESS, PORT)) ;
 			logstr += "|||Socket connected to: " + getSocket() ;
@@ -124,7 +123,9 @@ public class TCPClient implements Runnable{
 	}
 
 	public void run(){
-        setCSTAClientCommunications(false);
+        clientlog.info(this.getClass().getName() + " -> " + "run() REPLACEDLEWITHDLEDLE is set to " + REPLACEDLEWITHDLEDLE ) ;
+        clientlog.info(this.getClass().getName() + " -> " + "run() REPLACEDLEDLEWITHDLE is set to " + REPLACEDLEDLEWITHDLE ) ;
+        clientlog.info(this.getClass().getName() + " -> " + "run() CSTAClientCommunications is set to " + isCSTAClientCommunications() ) ;
         if( isCSTAClientCommunications() ){
             internalComms() ;
         }
