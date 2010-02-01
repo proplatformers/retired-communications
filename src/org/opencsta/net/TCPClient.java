@@ -82,8 +82,6 @@ public class TCPClient implements Runnable{
 			PORT = Integer.parseInt( theProps.getProperty(APPNAME + "_SERVER_PORT") ) ;
             clientlog.info(this.getClass().getName() + " -> " + "Setting SERVER_ADDRESS -> Getting property: " + APPNAME + "_SERVER_ADDRESS") ;
 			SERVER_ADDRESS = theProps.getProperty(APPNAME + "_SERVER_ADDRESS") ;
-            setREPLACEDLEWITHDLEDLE(Boolean.parseBoolean( theProps.getProperty(APPNAME + "_REPLACEDLEWITHDLEDLE" ) )) ;
-            setREPLACEDLEDLEWITHDLE(Boolean.parseBoolean(theProps.getProperty(APPNAME + "_REPLACEDLEDLEWITHDLE"))) ;
             clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEWITHDLEDLE is set to " + REPLACEDLEWITHDLEDLE ) ;
             clientlog.info(this.getClass().getName() + " -> " + "REPLACEDLEDLEWITHDLE is set to " + REPLACEDLEDLEWITHDLE ) ;
             clientlog.info(this.getClass().getName() + " -> " + "CSTAClientCommunications is set to " + isCSTAClientCommunications() ) ;
