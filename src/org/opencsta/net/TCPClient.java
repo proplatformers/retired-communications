@@ -164,7 +164,7 @@ public class TCPClient implements Runnable{
             theString = ReplaceDLEwithDLEDLEandWrap(theString) ;
         }
 		try{
-            byte[] barray = theString.getBytes() ;
+            byte[] barray = theString.getBytes("ISO-8859-1") ;
             out.write(barray) ;
 //			out.writeBytes(theString) ;
 		}catch(IOException e){
