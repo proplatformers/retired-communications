@@ -13,43 +13,52 @@ This file is part of Open CSTA.
 
     You should have received a copy of the GNU Lesser General Public License
     along with Open CSTA.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package org.opencsta.communications;
 
-
 /*
-Open Source CSTA (oscsta) creates a link between the computing network
-and the switching network.  Other libraries are used to configure and communicate
-with the network.  These libraries and the CSTA-Client are LGPL licensed.
-Copyright (C) 2006  mrvoip.com.au - Christopher Mylonas
-*/
+ Open Source CSTA (oscsta) creates a link between the computing network
+ and the switching network.  Other libraries are used to configure and communicate
+ with the network.  These libraries and the CSTA-Client are LGPL licensed.
+ Copyright (C) 2006  mrvoip.com.au - Christopher Mylonas
+ */
 
 /**
  * Any communications stream, network or serial, implements this method.
- *
- *
- * @author mylo
+ * 
+ * 
+ * @author chrismylonas
  */
 public interface CommunicationsStream {
-    
-    /**
-     * The String that will be sent goes through this method...test
-     *
-     *
-     * @return true when successful
-     * @param sb The string to be sent
+
+	/**
+	 * The String that will be sent goes through this method...test
+	 * 
+	 * 
+	 * @return true when successful
+	 * @param sb
+	 *            The string to be sent
+	 */
+	public boolean SendString(StringBuffer sb);
+
+	/**
+	 * Checks the string received to make sure it is valid and complete.
+	 * 
+	 * 
+	 * @return true if successfully received a full string
+	 * @param sb
+	 *            the string to be checked
+	 */
+	public boolean CheckReceived(StringBuffer sb);
+
+	/**
+     * 
      */
-    public boolean SendString(StringBuffer sb) ;
-    
-    /**
-     * Checks the string received to make sure it is valid and complete.
-     *
-     *
-     * @return true if successfully received a full string
-     * @param sb the string to be checked
+	public void closeComms();
+
+	/**
+     * 
      */
-    public boolean CheckReceived(StringBuffer sb) ;
-    public void closeComms();
-    public void openComms();
+	public void openComms();
 }

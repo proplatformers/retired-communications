@@ -13,30 +13,45 @@ This file is part of Open CSTA.
 
     You should have received a copy of the GNU Lesser General Public License
     along with Open CSTA.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package org.opencsta.net;
 
 import java.net.Socket;
 
 /**
- * This interface is implemented by the parent of a TCPClient.  It only has one method to contain, being PassedUp.
- *
- *
- * @author mylo
+ * This interface is implemented by the parent of a TCPClient. It only has one
+ * method to contain, being PassedUp.
+ * 
+ * 
+ * @author chrismylonas
  */
 public interface TCPClientOwnerInterface {
-    
-    /**
-     * The only required method in this interface.  This is the method that is called
-     * by TCPClient once a string has been received and needs processing.
-     * An implementor of this interface is more often than not the CSTAClientBase class.
-     *
-     * @return
-     * @param curInStr StringBuffer that has been received and needs to be processed
+
+	/**
+	 * The only required method in this interface. This is the method that is
+	 * called by TCPClient once a string has been received and needs processing.
+	 * An implementor of this interface is more often than not the
+	 * CSTAClientBase class.
+	 * 
+	 * @return
+	 * @param curInStr
+	 *            StringBuffer that has been received and needs to be processed
+	 */
+	boolean PassedUp(StringBuffer curInStr);
+
+	/**
+	 * @return
+	 */
+	public Socket getSocket();
+
+	/**
+	 * @param str
+	 */
+	void addWorkIN(StringBuffer str);
+
+	/**
+     * 
      */
-    boolean PassedUp(StringBuffer curInStr);
-    public Socket getSocket() ;
-    void addWorkIN(StringBuffer str) ;
-    public void cstaFail() ;
+	public void cstaFail();
 }
