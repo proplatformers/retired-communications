@@ -1,4 +1,5 @@
 <project name="opencsta-communications" default="dist" basedir=".">
+    <typedef resource="dependencies.properties" />
     <description>
         simple build file
     </description>
@@ -8,11 +9,13 @@
   <property name="dist"  location="dist"/>
   <property name="conf"  location="conf"/>
 
-
+<!--
+  USE THIS COMMENTED OUT SECTION PUTTING THE JARS IN /tmp
   <path id="csta.classpath">
-    <pathelement location="/Users/cm/opencstalibs/log4j-1.2.15.jar"/>
-    <pathelement location="/Users/cm/opencstalibs/opencsta-stack.jar"/>
+    <pathelement location="/tmp/log4j-1.2.15.jar"/>
+    <pathelement location="/tmp/opencsta-stack.jar"/>
   </path>
+-->
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -21,11 +24,21 @@
     <mkdir dir="${build}"/>
   </target>
 
-  <target name="compile" depends="init"
+  <target name="getdeps">
+    <dependencies filesetid="files.deps" pathid="classpath.deps">
+      <maven-repository url="http://tour.opencsta.org:8080/archiva/repository/internal/" />
+      <dependency group="org.apache" artifact="logging-log4j" version="1.2.14" />
+      <maven-repository />
+      <maven-repository url="http://tour.opencsta.org:8080/archiva/repository/snapshots/" />
+      <dependency group="org.opencsta" artifact="stack" version="1.0-20101227.073513-1" />
+    </dependencies>
+  </target>
+
+  <target name="compile" depends="init,getdeps"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
     <javac srcdir="${src}" destdir="${build}">
-        <classpath refid="csta.classpath"/>
+        <classpath refid="classpath.deps"/> <!-- IF USING csta.classpath instead of ant dependencies, use csta.classpath instead of classpath.deps -->
     </javac>
   </target>
 
@@ -33,6 +46,10 @@
         description="generate the distribution" >
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}/lib"/>
+
+    <copy todir="${dist}/lib" flatten="true">
+      <fileset refid="files.deps" />
+    </copy>
 
     <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
     <jar jarfile="${dist}/${ant.project.name}.jar" basedir="${build}"/>
