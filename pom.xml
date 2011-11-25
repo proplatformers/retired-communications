@@ -66,7 +66,7 @@
     <snapshotRepository>
       <id>snapshots</id>
       <name>Archiva Managed Snapshots Repository</name>
-      <url>dav:http://tour.opencsta.org:8080/archiva/repository/snapshots</url>
+      <url>dav:http://repo.opencsta.org:8080/archiva/repository/snapshots</url>
       <uniqueVersion>true</uniqueVersion>
       <layout>default</layout>
     </snapshotRepository>
