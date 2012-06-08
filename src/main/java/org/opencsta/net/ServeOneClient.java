@@ -17,11 +17,13 @@ This file is part of Open CSTA.
 
 package org.opencsta.net;
 
-import java.net.Socket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import org.apache.log4j.*;
+import java.net.Socket;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class, when instantiated, is used to handle one and only one client
@@ -36,7 +38,7 @@ public class ServeOneClient extends Thread {
 	/**
 	 * 
 	 */
-	protected static Logger alog = Logger.getLogger(MVListeningThread.class);
+	protected static Logger alog = LoggerFactory.getLogger(MVListeningThread.class);
 
 	/**
 	 * DLE character 0x10

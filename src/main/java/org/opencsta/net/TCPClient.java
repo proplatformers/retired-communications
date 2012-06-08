@@ -17,10 +17,15 @@ This file is part of Open CSTA.
 
 package org.opencsta.net;
 
-import java.net.*;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Properties;
-import org.apache.log4j.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TCPClient is the client side network communications class that connects to
@@ -33,7 +38,7 @@ public class TCPClient implements Runnable {
 	/**
 	 * 
 	 */
-	protected Logger clientlog = Logger.getLogger(TCPClient.class);
+	protected Logger clientlog = LoggerFactory.getLogger(TCPClient.class);
 
 	/**
 	 * 
@@ -202,7 +207,7 @@ public class TCPClient implements Runnable {
 					.warn(this.getClass().getName()
 							+ " -> "
 							+ "No I/O!  The CSTA Server is probably not running or not running for this applications configuration");
-			clientlog.fatal(this.getClass().getName() + " -> " + " check "
+			clientlog.error(this.getClass().getName() + " -> " + " check "
 					+ getAPP_CONFIG_FILE() + " for " + APPNAME
 					+ "_SERVER_PORT and " + APPNAME + "_SERVER_ADDRESS");
 			// System.exit(1);
@@ -376,32 +381,15 @@ public class TCPClient implements Runnable {
 			} else if (isBufferStillReading_NC(chris)) {
 				clientlog.info(this.getClass().getName() + " -> "
 						+ "Buffer is still reading");
-				// System.out.println("Incoming Buffer is still reading");
-				// System.out.println("The length of chris at the moment is: " +
-				// Integer.toString(chris.length() ) );
-				// System.out.println("The length of chris full message should be (hex): "
-				// + Integer.toHexString( (int)chris.charAt(2)) ) ;
-				// System.out.println("The length of chris full message should be (dec): "
-				// + Integer.toString( chris.charAt(2)) ) ;
 			} else if (isBufferHoldingMoreThanOneMessage_NC(chris)) {
 				clientlog.info(this.getClass().getName() + " -> "
 						+ "Buffer is holding more than one message");
-				// System.out.println("Incoming Buffer has over read more than one message")
-				// ;
-				// System.out.println("The length of chris at the moment is: " +
-				// Integer.toString(chris.length() ) );
-				// System.out.println("The length of chris full message should be (hex): "
-				// + Integer.toHexString( (int)chris.charAt(2)) ) ;
-				// System.out.println("The length of chris full message should be (dec): "
-				// + Integer.toString( chris.charAt(2)) ) ;
 				StringBuffer tmp = new StringBuffer(chris.substring(0,
 						(((int) chris.charAt(1)) + 2)));
 				parent.addWorkIN(new StringBuffer(chris.substring(0,
 						(((int) chris.charAt(1)) + 2))));
 				chris = new StringBuffer(
 						chris.substring(((int) chris.charAt(1) + 2)));
-				// System.out.println("The new active buffered message is") ;
-				// TestChris(chris) ;
 				checkBuffer_NC();
 			}
 		}
@@ -421,34 +409,15 @@ public class TCPClient implements Runnable {
 			} else if (isBufferStillReading(chris)) {
 				clientlog.info(this.getClass().getName() + " -> "
 						+ "Buffer is still reading");
-				// System.out.println("Incoming Buffer is still reading");
-				// System.out.println("The length of chris at the moment is: " +
-				// Integer.toString(chris.length() ) );
-				// System.out.println("The length of chris full message should be (hex): "
-				// + Integer.toHexString( (int)chris.charAt(2)) ) ;
-				// System.out.println("The length of chris full message should be (dec): "
-				// + Integer.toString( chris.charAt(2)) ) ;
 			} else if (isBufferHoldingMoreThanOneMessage(chris)) {
 				clientlog.info(this.getClass().getName() + " -> "
 						+ "Buffer is holding more than one message");
-				// System.out.println("Incoming Buffer has over read more than one message")
-				// ;
-				// System.out.println("The length of chris at the moment is: " +
-				// Integer.toString(chris.length() ) );
-				// System.out.println("The length of chris full message should be (hex): "
-				// + Integer.toHexString( (int)chris.charAt(2)) ) ;
-				// System.out.println("The length of chris full message should be (dec): "
-				// + Integer.toString( chris.charAt(2)) ) ;
 				StringBuffer tmp = new StringBuffer(chris.substring(0,
 						(((int) chris.charAt(2)) + 3)));
-				// System.out.println("Test this tmp string") ;
-				// TestChris(tmp) ;
 				parent.addWorkIN(new StringBuffer(chris.substring(0,
 						(((int) chris.charAt(2)) + 3))));
 				chris = new StringBuffer(
 						chris.substring(((int) chris.charAt(2) + 3)));
-				// System.out.println("The new active buffered message is") ;
-				// TestChris(chris) ;
 				checkBuffer();
 			}
 		}

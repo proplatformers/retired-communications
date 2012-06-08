@@ -17,12 +17,13 @@ This file is part of Open CSTA.
 
 package org.opencsta.net;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.SocketTimeoutException;
-import org.apache.log4j.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used for listening for a client connection by the server. When
@@ -35,7 +36,7 @@ public class MVListeningThread implements Runnable {
 	/**
 	 * 
 	 */
-	protected static Logger alog = Logger.getLogger(MVListeningThread.class);
+	protected static Logger alog = LoggerFactory.getLogger(MVListeningThread.class);
 
 	/**
 	 * The owner of this listening thread
